@@ -9,7 +9,7 @@
       <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_16gzt2m" sourceRef="say-hello" targetRef="EndEvent_0x6ir2l" />
-    <bpmn:serviceTask id="say-hello" name="Say hello to&#10;admin" camunda:class="com.interview.carworkflow.service.SelectVehicleService">
+    <bpmn:serviceTask id="say-hello" name="Select Vehicle" camunda:class="com.interview.carworkflow.service.SelectVehicleService">
       <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -24,6 +24,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_005qcpw_di" bpmnElement="say-hello">
         <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
         <di:waypoint x="215" y="117" />

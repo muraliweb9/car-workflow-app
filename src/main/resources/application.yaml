@@ -3,6 +3,17 @@ spring:
     name: car-workflow-app
   datasource:
     url: jdbc:h2:file:./camunda-h2-database
+  h2:
+    console:
+      #  http://localhost:<springboot_port>/h2-console
+      # Username and password leave blank
+      # Use JDBC url from above
+      # Deployments:         select * from ACT_RE_DEPLOYMENT
+      # Running processes:   select * from ACT_RE_PROCDEF
+      # Running tasks:       select * from ACT_RU_TASK
+      # Completed processes: select * FROM ACT_HI_PROCINST
+      # Completed tasks:     select * from ACT_HI_TASKINST
+      enabled: true
   boot:
     admin:
       client:
@@ -24,52 +35,52 @@ server:
       name: car-worlflow-app.log
       max-history: 5
       max-size: 10MB
-  management:
-    endpoint:
-      env:
-        # show the values in actuator/env endpoint
-        # e.g. http://localhost:8101/actuator/env
-        show-values: ALWAYS
-      configprops:
-        # show the values in actuator/configprops endpoint
-        # e.g. http://localhost:8101/actuator/configprops
-        show-values: ALWAYS
-      health:
-        # Note show-details
-        show-details: ALWAYS
-      shutdown:
-        enabled: true
-    endpoints:
-      enabledByDefault: true
-      env:
-        # mask these values in actuator/env endpoint
-        keys-to-sanitize: password,secret
-      configprops:
-        # mask these values in actuator/configprops endpoint
-        keys-to-sanitize: password,secret
-      web:
-        exposure:
-          include: "*"
-    info:
-      env:
-        enabled: true
-      build:
-        enabled: true
-      git:
-        # All the GIT info
-        mode: full
-        enabled: true
-      java:
-        enabled: true
-      os:
-        enabled: true
-  eureka:
-    client:
-      registerWithEureka: true
-      fetchRegistry: true
-      serviceUrl:
-        defaultZone: http://localhost:8761/eureka/
-    instance:
-      leaseRenewalIntervalInSeconds: 10
-      metadataMap:
-        instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}:${random.value}}
+management:
+  endpoint:
+    env:
+      # show the values in actuator/env endpoint
+      # e.g. http://localhost:8101/actuator/env
+      show-values: ALWAYS
+    configprops:
+      # show the values in actuator/configprops endpoint
+      # e.g. http://localhost:8101/actuator/configprops
+      show-values: ALWAYS
+    health:
+      # Note show-details
+      show-details: ALWAYS
+    shutdown:
+      enabled: true
+  endpoints:
+    enabledByDefault: true
+    env:
+      # mask these values in actuator/env endpoint
+      keys-to-sanitize: password,secret
+    configprops:
+      # mask these values in actuator/configprops endpoint
+      keys-to-sanitize: password,secret
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+    build:
+      enabled: true
+    git:
+      # All the GIT info
+      mode: full
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}:${random.value}}
