@@ -3,10 +3,12 @@ spring:
     name: car-workflow-app
   datasource:
     url: jdbc:h2:file:./camunda-h2-database
+    username: sa
+    password: sa
   h2:
     console:
       #  http://localhost:<springboot_port>/h2-console
-      # Username and password leave blank
+      # Username and password see above
       # Use JDBC url from above
       # Deployments:         select * from ACT_RE_DEPLOYMENT
       # Running processes:   select * from ACT_RE_PROCDEF
@@ -26,7 +28,7 @@ camunda.bpm.admin-user:
   password: admin
 server:
   # Allow for automatic available port allocation
-  port: 0
+  port: 59455
   error:
     # e.g. when an 500 error is displayed will have the underlying error message
     include-message: always
