@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 @Slf4j
-public class CamundaApiService {
+public class BpmApiService {
     @Autowired
     private ProcessEngine processEngine = null;
 

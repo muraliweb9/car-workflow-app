@@ -10,21 +10,17 @@ import com.interview.carworkflow.data.CustomerDetails;
 import com.interview.carworkflow.data.ProcessInstanceDto;
 import com.interview.carworkflow.data.TaskCompletionStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Iterator;
 import java.util.Map;
 
 //@Tag(name = "Booking Service", description = "Car Hire Booking Service")
@@ -39,7 +35,7 @@ public class CarWorkflowService {
     private static final String ENTER_CUST_DETAILS_TASK_ID = "enter-customer-details";
 
     @Autowired
-    private CamundaApiService camundaApiService;
+    private BpmApiService bpmApiService;
 
 //    @Operation(
 //            summary = "Start Process Instance",
@@ -52,7 +48,7 @@ public class CarWorkflowService {
     @PostMapping("startProcess")
     public ProcessInstanceDto startProcess()
     {
-        ProcessInstance processInstance = camundaApiService.getRuntimeService()
+        ProcessInstance processInstance = bpmApiService.getRuntimeService()
                 .startProcessInstanceByKey(CAR_WORKFLOW_PROCESS_ID);
 
         return ProcessInstanceDto.from(processInstance);
@@ -66,13 +62,21 @@ public class CarWorkflowService {
         String lastName = customerDetails.getLastName();
         String licenceNumber = customerDetails.getLicenceNumber();
 
-        TaskService taskService = camundaApiService.getTaskService();
+        TaskService taskService = bpmApiService.getTaskService();
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId)
                 .taskDefinitionKey(ENTER_CUST_DETAILS_TASK_ID).singleResult();
+
+//        taskService.setVariables(task.getId(),
+//                Map.of("firstName", firstName,
+//                        "lastName", lastName,
+//                        "licenceNumber", licenceNumber));
         taskService.complete(task.getId(),
                 Map.of("firstName", firstName,
                         "lastName", lastName,
                 "licenceNumber", licenceNumber));
+
+
 
         return TaskCompletionStatus.COMPLETED;
 

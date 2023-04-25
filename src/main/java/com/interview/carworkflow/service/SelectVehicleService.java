@@ -13,6 +13,10 @@ public class SelectVehicleService implements JavaDelegate {
 
         log.info("Running SelectVehicleService !!");
 
+        var map = delegateExecution.getVariables();
+
+        map.entrySet().stream().forEach(e -> System.out.println(e));
+
         log.info("DelegateExecution {}", delegateExecution);
 
     }

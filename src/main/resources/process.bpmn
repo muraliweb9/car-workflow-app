@@ -16,6 +16,9 @@
           <camunda:inputParameter name="firstName" />
           <camunda:inputParameter name="lastName" />
           <camunda:inputParameter name="licenceNumber" />
+          <camunda:outputParameter name="firstName">${firstName}</camunda:outputParameter>
+          <camunda:outputParameter name="lastName">${lastName}</camunda:outputParameter>
+          <camunda:outputParameter name="licenceNumber">${licenceNumber}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
