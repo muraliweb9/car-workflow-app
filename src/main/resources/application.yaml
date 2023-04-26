@@ -28,7 +28,7 @@ camunda.bpm.admin-user:
   password: admin
 server:
   # Allow for automatic available port allocation
-  port: 59455
+  port: 0 #59455
   error:
     # e.g. when an 500 error is displayed will have the underlying error message
     include-message: always
