@@ -6,9 +6,11 @@ package com.interview.carworkflow.service;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;
 //import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.interview.carworkflow.data.CustomerDetails;
 import com.interview.carworkflow.data.ProcessInstanceDto;
 import com.interview.carworkflow.data.TaskCompletionStatus;
+import com.interview.carworkflow.data.VehicleHandoverDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,10 +36,12 @@ public class CarWorkflowService {
 
     private static final String ENTER_CUST_DETAILS_TASK_ID = "enter-customer-details";
 
+    private static final String VEHICLE_HANDOVER_TASK_ID = "vehicle-handover";
+
     @Autowired
     private BpmApiService bpmApiService;
 
-//    @Operation(
+    //    @Operation(
 //            summary = "Start Process Instance",
 //            description = "tart Process Instance",
 //            tags = { "startProcess", "post" })
@@ -46,8 +50,7 @@ public class CarWorkflowService {
 //            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
 //            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @PostMapping("startProcess")
-    public ProcessInstanceDto startProcess()
-    {
+    public ProcessInstanceDto startProcess() {
         ProcessInstance processInstance = bpmApiService.getRuntimeService()
                 .startProcessInstanceByKey(CAR_WORKFLOW_PROCESS_ID);
 
@@ -56,8 +59,7 @@ public class CarWorkflowService {
     }
 
     @PostMapping("enterCustomerDetails/{processInstanceId}")
-    public TaskCompletionStatus enterCustomerDetails(@PathVariable String processInstanceId, @RequestBody CustomerDetails customerDetails)
-    {
+    public TaskCompletionStatus enterCustomerDetails(@PathVariable String processInstanceId, @RequestBody CustomerDetails customerDetails) {
         String firstName = customerDetails.getFirstName();
         String lastName = customerDetails.getLastName();
         String licenceNumber = customerDetails.getLicenceNumber();
@@ -67,18 +69,33 @@ public class CarWorkflowService {
         Task task = taskService.createTaskQuery().processInstanceId(processInstanceId)
                 .taskDefinitionKey(ENTER_CUST_DETAILS_TASK_ID).singleResult();
 
-//        taskService.setVariables(task.getId(),
-//                Map.of("firstName", firstName,
-//                        "lastName", lastName,
-//                        "licenceNumber", licenceNumber));
         taskService.complete(task.getId(),
                 Map.of("firstName", firstName,
                         "lastName", lastName,
-                "licenceNumber", licenceNumber));
-
-
+                        "licenceNumber", licenceNumber));
 
         return TaskCompletionStatus.COMPLETED;
+
+    }
+
+    @PostMapping("vehicleHandover/{processInstanceId}")
+    public TaskCompletionStatus vehicleHandover(@PathVariable String processInstanceId,
+                                                @RequestBody VehicleHandoverDetails vehicleHandoverDetails) {
+        boolean allChecksDone = vehicleHandoverDetails.allChecksDone();
+
+        if (allChecksDone) {
+            TaskService taskService = bpmApiService.getTaskService();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstanceId)
+                    .taskDefinitionKey(VEHICLE_HANDOVER_TASK_ID).singleResult();
+
+            taskService.complete(task.getId(),
+                    Map.of("allChecksDone", Boolean.valueOf(allChecksDone)));
+
+            return TaskCompletionStatus.COMPLETED;
+        }
+        return TaskCompletionStatus.INCOMPLETE;
+
 
     }
 }

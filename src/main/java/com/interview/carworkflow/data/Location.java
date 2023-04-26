@@ -9,15 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Data
-@Entity
 @Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDetails {
-
+public class Location {
     @Id
     private String id;
-    private String firstName;
-    private String lastName;
-    private String licenceNumber;
+    private String locationName;
 }
