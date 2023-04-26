@@ -24,7 +24,7 @@
       <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="select-vehicle" name="Select Vehice" camunda:delegateExpression="#(selectVehicleService)">
+    <bpmn:serviceTask id="select-vehicle" name="Select Vehice" camunda:delegateExpression="#{selectVehicleService}">
       <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
       <bpmn:outgoing>Flow_1b3gjeo</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -34,7 +34,7 @@
       <bpmn:outgoing>Flow_13rreqe</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_0bntixw" sourceRef="Activity_1ftqppx" targetRef="EndEvent_0x6ir2l" />
-    <bpmn:serviceTask id="Activity_1ftqppx" name="Finalise Booking" camunda:delegateExpression="#(finaliseBookingService)">
+    <bpmn:serviceTask id="Activity_1ftqppx" name="Finalise Booking" camunda:delegateExpression="#{finaliseBookingService}">
       <bpmn:incoming>Flow_13rreqe</bpmn:incoming>
       <bpmn:outgoing>Flow_0bntixw</bpmn:outgoing>
     </bpmn:serviceTask>

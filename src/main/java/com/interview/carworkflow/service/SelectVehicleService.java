@@ -31,7 +31,7 @@ public class SelectVehicleService implements JavaDelegate {
 
         delegateExecution.setVariable("car", car);
 
-        log.info("Car [] has been selected", car);
+        log.info("Car {} has been selected", car);
 
     }
 }
