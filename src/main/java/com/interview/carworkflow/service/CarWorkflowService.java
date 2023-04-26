@@ -13,6 +13,7 @@ import com.interview.carworkflow.data.TaskCompletionStatus;
 import com.interview.carworkflow.data.VehicleHandoverDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,7 @@ public class CarWorkflowService {
                                                 @RequestBody VehicleHandoverDetails vehicleHandoverDetails) {
         boolean allChecksDone = vehicleHandoverDetails.allChecksDone();
 
-        if (allChecksDone) {
+        //if (allChecksDone) {
             TaskService taskService = bpmApiService.getTaskService();
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstanceId)
@@ -93,8 +94,10 @@ public class CarWorkflowService {
                     Map.of("allChecksDone", Boolean.valueOf(allChecksDone)));
 
             return TaskCompletionStatus.COMPLETED;
-        }
-        return TaskCompletionStatus.INCOMPLETE;
+        //}
+        //return TaskCompletionStatus.INCOMPLETE;
+        //
+
 
 
     }
