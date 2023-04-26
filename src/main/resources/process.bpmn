@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.10.0">
   <bpmn:process id="car-workflow-app-process" isExecutable="true">
+    <bpmn:extensionElements />
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
     </bpmn:startEvent>
@@ -28,13 +29,20 @@
       <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
       <bpmn:outgoing>Flow_1b3gjeo</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_13rreqe" sourceRef="vehicle-handover" targetRef="Activity_1ftqppx" />
+    <bpmn:sequenceFlow id="Flow_13rreqe" sourceRef="vehicle-handover" targetRef="finalise-booking" />
     <bpmn:userTask id="vehicle-handover" name="Vehicle Handover">
+      <bpmn:extensionElements>
+        <camunda:taskListener delegateExpression="#{vehicleHandoverListener}" event="create" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_1b3gjeo</bpmn:incoming>
       <bpmn:outgoing>Flow_13rreqe</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_0bntixw" sourceRef="Activity_1ftqppx" targetRef="EndEvent_0x6ir2l" />
-    <bpmn:serviceTask id="Activity_1ftqppx" name="Finalise Booking" camunda:delegateExpression="#{finaliseBookingService}">
+    <bpmn:sequenceFlow id="Flow_0bntixw" sourceRef="finalise-booking" targetRef="EndEvent_0x6ir2l" />
+    <bpmn:serviceTask id="finalise-booking" name="Finalise Booking" camunda:delegateExpression="#{finaliseBookingService}">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="#{finaliseBookingListener}" event="start" />
+        <camunda:executionListener delegateExpression="#{finaliseBookingListener}" event="end" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_13rreqe</bpmn:incoming>
       <bpmn:outgoing>Flow_0bntixw</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -54,12 +62,12 @@
       <bpmndi:BPMNShape id="Activity_18t755l_di" bpmnElement="vehicle-handover">
         <dc:Bounds x="560" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEvent_0x6ir2l">
-        <dc:Bounds x="882" y="99" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0l9rff8_di" bpmnElement="Activity_1ftqppx">
-        <dc:Bounds x="720" y="77" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0l9rff8_di" bpmnElement="finalise-booking">
+        <dc:Bounds x="710" y="77" width="100" height="80" />
         <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEvent_0x6ir2l">
+        <dc:Bounds x="912" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
         <di:waypoint x="215" y="117" />
@@ -75,11 +83,11 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13rreqe_di" bpmnElement="Flow_13rreqe">
         <di:waypoint x="660" y="117" />
-        <di:waypoint x="720" y="117" />
+        <di:waypoint x="710" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0bntixw_di" bpmnElement="Flow_0bntixw">
-        <di:waypoint x="820" y="117" />
-        <di:waypoint x="882" y="117" />
+        <di:waypoint x="810" y="117" />
+        <di:waypoint x="912" y="117" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
