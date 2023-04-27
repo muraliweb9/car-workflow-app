@@ -1,4 +1,4 @@
-package com.interview.carworkflow.service;
+package com.interview.carworkflow.service.task;
 
 import com.interview.carworkflow.data.Car;
 import com.interview.carworkflow.data.Location;
@@ -12,7 +12,8 @@ import javax.inject.Named;
 @Component
 @Slf4j
 @Named
-public class SelectVehicleService implements JavaDelegate {
+public class SelectVehicleTask implements JavaDelegate {
+
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
 

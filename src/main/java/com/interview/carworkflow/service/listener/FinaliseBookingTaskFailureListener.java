@@ -1,4 +1,4 @@
-package com.interview.carworkflow.service;
+package com.interview.carworkflow.service.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -10,14 +10,14 @@ import javax.inject.Named;
 @Named
 @Component
 @Slf4j
-public class HandoverFailureListener implements ExecutionListener {
+public class FinaliseBookingTaskFailureListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
         String eventName = execution.getEventName();
         String name = execution.getCurrentActivityName();
 
-        log.info("Handover failure occurred [{}] had event [{}]", name, eventName);
+        log.info("Finalise failure occurred [{}] had event [{}]", name, eventName);
 
     }
 }

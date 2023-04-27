@@ -2,15 +2,15 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.10.0">
   <bpmn:process id="car-workflow-app-process" isExecutable="true">
     <bpmn:extensionElements />
-    <bpmn:startEvent id="StartEvent_1">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
       <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="StartEvent_1" targetRef="enter-customer-details" />
-    <bpmn:endEvent id="EndEvent_0x6ir2l">
+    <bpmn:endEvent id="EndEvent_0x6ir2l" name="End">
       <bpmn:incoming>Flow_0bntixw</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_16gzt2m" sourceRef="enter-customer-details" targetRef="select-vehicle" />
-    <bpmn:sequenceFlow id="Flow_1b3gjeo" sourceRef="select-vehicle" targetRef="vehicle-handover" />
+    <bpmn:sequenceFlow id="Flow_1b3gjeo" sourceRef="select-vehicle" targetRef="handover-vehicle" />
     <bpmn:userTask id="enter-customer-details" name="Enter Customer Details">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -25,39 +25,36 @@
       <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="select-vehicle" name="Select Vehice" camunda:delegateExpression="#{selectVehicleService}">
+    <bpmn:serviceTask id="select-vehicle" name="Select Vehice" camunda:delegateExpression="#{selectVehicleTask}">
       <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
       <bpmn:outgoing>Flow_1b3gjeo</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_13rreqe" sourceRef="vehicle-handover" targetRef="finalise-booking" />
-    <bpmn:userTask id="vehicle-handover" name="Vehicle Handover">
+    <bpmn:sequenceFlow id="Flow_13rreqe" sourceRef="handover-vehicle" targetRef="check-handover" />
+    <bpmn:userTask id="handover-vehicle" name="Handover Vehicle ">
       <bpmn:extensionElements>
-        <camunda:taskListener delegateExpression="#{vehicleHandoverListener}" event="complete" />
+        <camunda:taskListener delegateExpression="#{handoverVehicleTaskListener}" event="complete" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1b3gjeo</bpmn:incoming>
       <bpmn:outgoing>Flow_13rreqe</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_0bntixw" sourceRef="finalise-booking" targetRef="EndEvent_0x6ir2l" />
-    <bpmn:serviceTask id="finalise-booking" name="Finalise Booking" camunda:delegateExpression="#{finaliseBookingService}">
-      <bpmn:extensionElements>
-        <camunda:executionListener delegateExpression="#{finaliseBookingListener}" event="start" />
-        <camunda:executionListener delegateExpression="#{finaliseBookingListener}" event="end" />
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_13rreqe</bpmn:incoming>
+    <bpmn:serviceTask id="finalise-booking" name="Finalise Booking" camunda:delegateExpression="#{finaliseBookingTask}">
+      <bpmn:extensionElements />
+      <bpmn:incoming>handover-ok</bpmn:incoming>
       <bpmn:outgoing>Flow_0bntixw</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:boundaryEvent id="invalid-handover" name="Invalid Hadover" attachedToRef="vehicle-handover">
-      <bpmn:extensionElements>
-        <camunda:executionListener delegateExpression="#{handoverFailureListener}" event="start" />
-      </bpmn:extensionElements>
-      <bpmn:outgoing>Flow_08nzm88</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_0su04yn" errorRef="Error_1ihh21v" camunda:errorCodeVariable="carHandoverFailureCode" camunda:errorMessageVariable="carHandoverFailureMessage" />
+    <bpmn:boundaryEvent id="invalid-finalise" name="Invalid Finalise" attachedToRef="finalise-booking">
+      <bpmn:extensionElements />
+      <bpmn:outgoing>Flow_1vkxwku</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0su04yn" errorRef="Error_1i38r2h" camunda:errorCodeVariable="customerCheksFailureCode" camunda:errorMessageVariable="customerCheksFailureMessage" />
     </bpmn:boundaryEvent>
-    <bpmn:userTask id="Activity_1m8lp7t" name="Return to Depot">
-      <bpmn:incoming>Flow_08nzm88</bpmn:incoming>
+    <bpmn:userTask id="return-vehicle-to-depot" name="Return Vehicle To Depot">
+      <bpmn:incoming>handover-fail</bpmn:incoming>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_08nzm88" sourceRef="invalid-handover" targetRef="Activity_1m8lp7t" />
-    <bpmn:boundaryEvent id="delayed-handover" name="Delayed Handover" attachedToRef="vehicle-handover">
+    <bpmn:sequenceFlow id="handover-fail" name="Fail" sourceRef="check-handover" targetRef="return-vehicle-to-depot">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{allChecksDone == 'false'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:boundaryEvent id="delayed-handover" name="Delayed Handover" attachedToRef="handover-vehicle">
       <bpmn:outgoing>Flow_14q5aor</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_0tpx4y1">
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT60S</bpmn:timeDuration>
@@ -66,16 +63,38 @@
     <bpmn:sequenceFlow id="Flow_14q5aor" sourceRef="delayed-handover" targetRef="Activity_1djgjie" />
     <bpmn:userTask id="Activity_1djgjie" name="Escalate to Supevisor">
       <bpmn:extensionElements>
-        <camunda:executionListener delegateExpression="#{handoverDelayListener}" event="start" />
+        <camunda:executionListener delegateExpression="#{escalateToSupervisorTaskListener}" event="start" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_14q5aor</bpmn:incoming>
     </bpmn:userTask>
+    <bpmn:exclusiveGateway id="check-handover" name="Was the handover ok?">
+      <bpmn:incoming>Flow_13rreqe</bpmn:incoming>
+      <bpmn:outgoing>handover-ok</bpmn:outgoing>
+      <bpmn:outgoing>handover-fail</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="handover-ok" name="Ok" sourceRef="check-handover" targetRef="finalise-booking">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{allChecksDone == 'true'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1vkxwku" sourceRef="invalid-finalise" targetRef="Activity_10vygyj" />
+    <bpmn:userTask id="Activity_10vygyj" name="Unable to finalise booking">
+      <bpmn:incoming>Flow_1vkxwku</bpmn:incoming>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:error id="Error_1ihh21v" name="Car failed checks" errorCode="CAR_NOT_UPTO_STANDARD" camunda:errorMessage="Car did not meet standard for customer handover" />
+  <bpmn:error id="Error_1i38r2h" name="Customer checks failed" errorCode="FINALISE_FAIL_1" camunda:errorMessage="The customer details incomplete" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="car-workflow-app-process">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="322" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEvent_0x6ir2l">
+        <dc:Bounds x="1022" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1030" y="322" width="20" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_09ig2im_di" bpmnElement="enter-customer-details">
         <dc:Bounds x="270" y="257" width="100" height="80" />
@@ -84,34 +103,42 @@
       <bpmndi:BPMNShape id="Activity_0ps87su_di" bpmnElement="select-vehicle">
         <dc:Bounds x="420" y="257" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_18t755l_di" bpmnElement="vehicle-handover">
+      <bpmndi:BPMNShape id="Activity_18t755l_di" bpmnElement="handover-vehicle">
         <dc:Bounds x="560" y="257" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0l9rff8_di" bpmnElement="finalise-booking">
-        <dc:Bounds x="710" y="257" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEvent_0x6ir2l">
-        <dc:Bounds x="912" y="279" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_0l9rff8_di" bpmnElement="finalise-booking">
+        <dc:Bounds x="850" y="257" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1mqm2dp_di" bpmnElement="Activity_1m8lp7t">
-        <dc:Bounds x="660" y="80" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1mqm2dp_di" bpmnElement="return-vehicle-to-depot">
+        <dc:Bounds x="680" y="70" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ukmkfq_di" bpmnElement="Activity_1djgjie">
         <dc:Bounds x="650" y="400" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0hu7m1i_di" bpmnElement="invalid-handover">
-        <dc:Bounds x="592" y="239" width="36" height="36" />
+      <bpmndi:BPMNShape id="Gateway_17pnspd_di" bpmnElement="check-handover" isMarkerVisible="true">
+        <dc:Bounds x="705" y="272" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="621" y="223" width="78" height="14" />
+          <dc:Bounds x="687" y="329" width="90" height="27" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1hfkpxi_di" bpmnElement="Activity_10vygyj">
+        <dc:Bounds x="850" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_102ttzh_di" bpmnElement="delayed-handover">
         <dc:Bounds x="592" y="319" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="615" y="356" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0hu7m1i_di" bpmnElement="invalid-finalise">
+        <dc:Bounds x="882" y="239" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="914" y="223" width="73" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
@@ -128,21 +155,34 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13rreqe_di" bpmnElement="Flow_13rreqe">
         <di:waypoint x="660" y="297" />
-        <di:waypoint x="710" y="297" />
+        <di:waypoint x="705" y="297" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0bntixw_di" bpmnElement="Flow_0bntixw">
-        <di:waypoint x="810" y="297" />
-        <di:waypoint x="912" y="297" />
+        <di:waypoint x="950" y="297" />
+        <di:waypoint x="1022" y="297" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_08nzm88_di" bpmnElement="Flow_08nzm88">
-        <di:waypoint x="610" y="239" />
-        <di:waypoint x="610" y="120" />
-        <di:waypoint x="660" y="120" />
+      <bpmndi:BPMNEdge id="Flow_08nzm88_di" bpmnElement="handover-fail">
+        <di:waypoint x="730" y="272" />
+        <di:waypoint x="730" y="150" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="750" y="208" width="19" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_14q5aor_di" bpmnElement="Flow_14q5aor">
         <di:waypoint x="610" y="355" />
         <di:waypoint x="610" y="440" />
         <di:waypoint x="650" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_006ldga_di" bpmnElement="handover-ok">
+        <di:waypoint x="755" y="297" />
+        <di:waypoint x="850" y="297" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="795" y="279" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vkxwku_di" bpmnElement="Flow_1vkxwku">
+        <di:waypoint x="900" y="239" />
+        <di:waypoint x="900" y="160" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
