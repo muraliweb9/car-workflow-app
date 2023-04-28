@@ -81,7 +81,7 @@
     </bpmn:userTask>
   </bpmn:process>
   <bpmn:error id="Error_1ihh21v" name="Car failed checks" errorCode="CAR_NOT_UPTO_STANDARD" camunda:errorMessage="Car did not meet standard for customer handover" />
-  <bpmn:error id="Error_1i38r2h" name="Customer checks failed" errorCode="FINALISE_FAIL_1" camunda:errorMessage="The customer details incomplete" />
+  <bpmn:error id="Error_1i38r2h" name="Customer checks failed" errorCode="FINALISE_FAIL_1" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="car-workflow-app-process">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
