@@ -25,6 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+import static com.interview.carworkflow.service.consts.ProcessConstants.CAR_WORKFLOW_PROCESS_ID;
+import static com.interview.carworkflow.service.consts.ProcessConstants.ENTER_CUST_DETAILS_TASK_ID;
+import static com.interview.carworkflow.service.consts.ProcessConstants.HANDOVER_VEHICLE_TASK_ID;
+
+
 //@Tag(name = "Booking Service", description = "Car Hire Booking Service")
 @RestController
 @RequestMapping("/carworkflow")
@@ -32,11 +37,6 @@ import java.util.Map;
 @Slf4j
 public class CarWorkflowService {
 
-    private static final String CAR_WORKFLOW_PROCESS_ID = "car-workflow-app-process";
-
-    private static final String ENTER_CUST_DETAILS_TASK_ID = "enter-customer-details";
-
-    private static final String HANDOVER_VEHICLE_TASK_ID = "handover-vehicle";
 
     @Autowired
     private BpmApiService bpmApiService;
