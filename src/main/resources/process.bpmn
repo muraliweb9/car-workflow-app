@@ -26,6 +26,7 @@
       <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:serviceTask id="select-vehicle" name="Select Vehice" camunda:delegateExpression="#{selectVehicleTask}">
+      <bpmn:extensionElements />
       <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
       <bpmn:outgoing>Flow_1b3gjeo</bpmn:outgoing>
     </bpmn:serviceTask>
